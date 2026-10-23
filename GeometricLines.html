@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Geometrische Linien</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px 30px;
+        }
+        .info-box {
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            padding: 25px;
+            background-color: #f8f8f8;
+        }
+        .info-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 40px 30px;
+        }
+    </style>
+</head>
+<body>
+<h1>Geometrische Linien</h1>
+<canvas id="canvas" width="400" height="400"></canvas>
+<div class="info-container">
+<div  class="info-box">
+    <h3>Verwendete Quellen und Tools</h3>
+    <ul>
+        <li>
+            Loop-Vorlesungsskript Graphical Visualisation Technologies, Prof.
+            Dr. Felix Gers
+        </li>
+        <li>
+            <a
+                    href="https://www.magnific.com/de/vektoren-premium/japanische-origamipapiertierlinie-ikonen_4675146.htm#fromView=detail&position=9&from_element=cross_selling__vector"
+                    target="_blank"
+                    rel="noopener"
+            >
+               Inspiration für die Abbildung
+            </a>
+        </li>
+        <li>
+            <strong>Hinweis zur Nutzung generativer KI:</strong> Bei der
+            Bearbeitung dieser Aufgabe wurde ChatGPT als
+            unterstützendes Werkzeug genutzt. Es diente der Erläuterung
+            fachlicher Konzepte, der Unterstützung bei der Fehlersuche sowie der
+            Generierung und Diskussion von Lösungs- und Codevorschlägen.
+            Sämtliche übernommenen Inhalte wurden von mir nachvollzogen,
+            angepasst und auf ihre Funktionalität geprüft.
+        </li>
+    </ul>
+
+</div>
+</div>
+<script>
+    // Für mein persönliches Verständnis habe ich die jeweiligen Abschnitte aus dem Vorlesungsskript dazu kommentiert.
+    // Get the WebGL context
+    var canvas = document.getElementById("canvas");
+    var gl = canvas.getContext("experimental-webgl");
+
+    // Pipeline setup
+    gl.clearColor(1, 1, 0, 0.5);
+
+    // Abschnitt 5.3.1 – Vertex-Shader wird initialisiert
+    var vsSource =
+        "attribute vec2 pos;" +
+        "void main(){" +
+        "gl_Position = vec4((pos.x - 5.0) * 0.25, (pos.y - 6.6) * 0.25, 0, 1);" +
+        "}";
+    var vs = gl.createShader(gl.VERTEX_SHADER); //neues Shader-Objekt wird erzeugt & in der Variablen vs gespeichert
+    gl.shaderSource(vs, vsSource);
+    gl.compileShader(vs);
+
+    // Abschnitt 5.3.1 – Compile a fragment shader
+    fsSouce = "void main() { gl_FragColor = vec4(0, 0, 1, 1); }";
+    var fs = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fs, fsSouce);
+    gl.compileShader(fs);
+
+    // Abschnitt 5.3.1 – Link together into a program
+    var prog = gl.createProgram(); //Programm-Objekt wird erzeugt & in der Variablen prog gespeichert
+    gl.attachShader(prog, vs);
+    gl.attachShader(prog, fs);
+    gl.linkProgram(prog);
+    gl.useProgram(prog);
+
+    // Abschnitt 5.3.2 – Load vertex data into a buffer
+    var vertices = new Float32Array([
+        // Kopf
+        4.5, 9.0, 4.2, 9.5, 4.2, 9.5, 4.5, 10.0, 4.5, 10.0, 5.5, 10.0, 5.5,
+        10.0, 5.8, 9.5, 5.8, 9.5, 5.5, 9.0, 5.5, 9.0, 4.5, 9.0, 4.5, 10.0, 5.5,
+        9.0, 5.5, 10.0, 4.5, 9.0,
+
+        // Panzer
+        4.5, 9.0, 3.9, 9.0, 5.5, 9.0, 6.1, 9.0, 3.9, 9.0, 3.5, 6.0, 6.1, 9.0,
+        6.5, 6.0, 3.5, 6.0, 4.3, 4.9, 4.3, 4.9, 5.0, 4.2, 5.0, 4.2, 5.7, 4.9,
+        5.7, 4.9, 6.5, 6.0,
+
+        // linke Flosse vorn
+        4.1, 8.1, 3.0, 9.0, 3.0, 9.0, 2.8, 9.5, 2.8, 9.5, 2.8, 8.6, 2.8, 8.6,
+        3.6, 7.8, 3.6, 7.8, 3.1, 7.4, 3.1, 7.4, 3.5, 6.0,
+
+        // rechte Flosse vorn
+        5.9, 8.1, 7.0, 9.0, 7.0, 9.0, 7.2, 9.5, 7.2, 9.5, 7.2, 8.6, 7.2, 8.6,
+        6.4, 7.8, 6.4, 7.8, 6.9, 7.4, 6.9, 7.4, 6.5, 6.0,
+
+        //linke Flosse hinten
+        3.5, 6.0, 4.0, 5.6, 4.0, 5.6, 3.4, 4.5, 3.4, 4.5, 3.5, 3.2, 3.5, 3.2,
+        4.0, 4.2, 4.0, 4.2, 4.3, 4.9,
+
+        // rechte Flosse hinten
+        6.5, 6.0, 6.0, 5.6, 6.0, 5.6, 6.6, 4.5, 6.6, 4.5, 6.5, 3.2, 6.5, 3.2,
+        6.0, 4.2, 6.0, 4.2, 5.7, 4.9,
+
+        // innere Panzerlinien
+        4.5, 9.0, 6.5, 6.0, 5.5, 9.0, 3.5, 6.0, 3.5, 6.0, 6.5, 6.0, 3.5, 6.0,
+        5.7, 4.9, 6.5, 6.0, 4.3, 4.9, 3.9, 9.0, 5.0, 4.2, 6.1, 9.0, 5.0, 4.2,
+        4.3, 4.9, 5.7, 4.9,
+    ]);
+    var vbo = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+    // Abschnitt 5.3.2 – Bind vertex buffer to attribute variable
+    var posAttrib = gl.getAttribLocation(prog, "pos");
+    gl.vertexAttribPointer(posAttrib, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(posAttrib);
+
+    // Abschnitt 5.3.4 – Clear framebuffer and render primitives
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.LINES, 0, vertices.length / 2);
+</script>
+</body>
+</html>
